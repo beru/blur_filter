@@ -1,10 +1,11 @@
 
 #include <stdio.h>
+#include <malloc.h>
 
 #include "ReadImage/ReadImage.h"
 #include "ReadImage/File.h"
 
-#include <malloc.h>
+#include "box_blur_1b.h"
 
 void transpose(
 	const unsigned char* pSrc,
@@ -57,9 +58,23 @@ int main(int argc, char** argv)
 		pSrc[i] = palettes[4 * pSrc[i]];
 	}
 
-	unsigned char* pSrc2 = (unsigned char*) _aligned_malloc(size, 64);
-	transpose(pSrc, pSrc2, width, height, width, width);
-	
+	unsigned char* pWork = (unsigned char*) _aligned_malloc(size, 64);
+	unsigned char* pWork2 = (unsigned char*) _aligned_malloc(size, 64);
+	const unsigned char* pSrcLine = pSrc;
+	unsigned char* pDstLine = pWork;
+	for (size_t i=0; i<height; ++i) {
+		BoxBlur_1stOrder(pSrcLine, pDstLine, width, 15);
+		OffsetPtr(pSrcLine, width);
+		OffsetPtr(pDstLine, width);
+	}
+	transpose(pWork, pWork2, width, height, width, width);
+	pSrcLine = pWork2;
+	pDstLine = pWork;
+	for (size_t i=0; i<height; ++i) {
+		BoxBlur_1stOrder(pSrcLine, pDstLine, width, 15);
+		OffsetPtr(pSrcLine, width);
+		OffsetPtr(pDstLine, width);
+	}	
 	return 0;
 }
 
