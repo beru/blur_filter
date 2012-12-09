@@ -63,7 +63,7 @@ int main(int argc, char** argv)
 	const unsigned char* pSrcLine = pSrc;
 	unsigned char* pDstLine = pWork;
 	for (size_t i=0; i<height; ++i) {
-		BoxBlur_1stOrder(pSrcLine, pDstLine, width, 15);
+		BoxBlur_2ndOrder(pSrcLine, pDstLine, width, 5);
 		OffsetPtr(pSrcLine, width);
 		OffsetPtr(pDstLine, width);
 	}
@@ -71,7 +71,7 @@ int main(int argc, char** argv)
 	pSrcLine = pWork2;
 	pDstLine = pWork;
 	for (size_t i=0; i<height; ++i) {
-		BoxBlur_1stOrder(pSrcLine, pDstLine, width, 15);
+		BoxBlur_2ndOrder(pSrcLine, pDstLine, width, 5);
 		OffsetPtr(pSrcLine, width);
 		OffsetPtr(pDstLine, width);
 	}	
