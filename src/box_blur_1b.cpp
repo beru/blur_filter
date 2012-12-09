@@ -29,25 +29,24 @@ void BoxBlur_2ndOrder(const uint8_t* src, uint8_t* dst, size_t count, uint16_t r
 		sumTail += src[i];
 	}
 	uint32_t sumHead = sumTail;
-	const uint8_t* pPlusTail = &src[1+radius*2];
 	const uint8_t* pMinusTail = &src[0];
-	const uint8_t* pPlusHead = pPlusTail;
 	const uint8_t* pMinusHead = pMinusTail;
+	const uint8_t* pPlusHead = &src[1+radius*2];
 	uint32_t sum = 0;
 	for (; i<2+radius*4; ++i) {
 		sum += sumHead;
-		sumHead += *pPlusHead++;
 		sumHead -= *pMinusHead++;
+		sumHead += *pPlusHead++;
 	}
 	const size_t nSamples = (radius*2+1) * (radius*2+1);
+	int32_t sum0 = sumHead;
+	sum0 -= sumTail;
 	for (; i<count-radius; ++i) {
 		dst[i] = sum / nSamples;
-		sum += sumHead;
-		sum -= sumTail;
-		sumTail -= *pMinusTail++;
-		sumTail += *pPlusTail++;
-		sumHead -= *pMinusHead++;
-		sumHead += *pPlusHead++;
+		sum += sum0;
+		sum0 += *pMinusTail++;
+		sum0 -= 2 * *pMinusHead++;
+		sum0 += *pPlusHead++;
 	}
 }
 
