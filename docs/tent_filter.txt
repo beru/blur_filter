@@ -1,0 +1,212 @@
+-------------
+
+sum
+	tail
+	body
+	head
+
+next_sum
+
+	-sum.tail
+	+sum
+	+sum.next
+
+09
+10
+11
+
+10
+11
+12
+
+11
+12
+13
+
+12
+13
+14
+
+13
+14
+15
+
+
+09
+10 10
+11 11 11
+   12 12
+      13
+      
+   10
+   11 11
+   12 12 12
+      13 13
+         14
+         
+      11
+      12 12
+      13 13 13
+         14 14
+            15
+            
+               
+次の値に変化する為の合計値
+
+-09
+-10
+-11
++12
++13
++14
+
+それは次のように変化する。
+
+-10
+-11
+-12
++13
++14
++15
+
+---------
+
+09
+10
+11
+12
+13
+
+10
+11
+12
+13
+14
+
+11
+12
+13
+14
+15
+
+12
+13
+14
+15
+16
+
+13
+14
+15
+16
+17
+
+14
+15
+16
+17
+18
+
+09
+10 10
+11 11 11
+12 12 12 12
+13 13 13 13 13
+   14 14 14 14
+      15 15 15
+         16 16
+            17
+   10
+   11 11
+   12 12 12
+   13 13 13 13
+   14 14 14 14 14
+      15 15 15 15
+         16 16 16
+            17 17
+               18
+               
+
+次の値に変化する為の合計値
+
+-09
+-10
+-11
+-12
+-13
++14
++15
++16
++17
++18
+
+それは次のように変化する。
+
+-10
+-11
+-12
++13
++14
++15
+
+
+差分
+
++tail.tail 1
+-tail.next 2
++head.next 1
+
+
+----
+
+
+sum
+	tail
+	body
+	head
+
+next_sum
+	sum
+	-sum.tail
+	+sum.next
+	
+next_next_sum
+	next_sum
+	-next_sum.tail = -(+sum.tail -sum.tail.tail +sum.tail.next)
+	+next_sum.next = +(+sum.next -sum.next.tail +sum.next.next)
+	
+
+↓
+
+-(next_sum - sum) = +sum.tail -sum.next
+next_next_sum - next_sum = 
+	-sum.tail +sum.tail.tail -sum.tail.next
+	+sum.next -sum.next.tail +sum.next.next
+
+↓
+
++sum.tail
+-sum.tail
++sum.next
+-sum.next
++sum.tail.tail
+-sum.tail.next
+-sum.next.tail
++sum.next.next
+
+↓
+
++sum.tail.tail
+-sum.tail.next
+-sum.next.tail
++sum.next.next
+
+↓
+
+sum.tail.next = sum.next.tail
+
++sum.tail.tail
+-sum.tail.next 2
++sum.next.next
+
+

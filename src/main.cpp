@@ -58,23 +58,31 @@ int main(int argc, char** argv)
 		pSrc[i] = palettes[4 * pSrc[i]];
 	}
 
-	unsigned char* pWork = (unsigned char*) _aligned_malloc(size, 64);
-	unsigned char* pWork2 = (unsigned char*) _aligned_malloc(size, 64);
+	int radius = 3;
+	
+	BoxBlurFunc pBlurFunc = &BoxBlur_1stOrder;
+//	BoxBlurFunc pBlurFunc = &BoxBlur_2ndOrder;
+//	BoxBlurFunc pBlurFunc = &BoxBlur_3rdOrder;
+
+	size_t longSideLen = max(width, height);
+	unsigned char* pWork = (unsigned char*) _aligned_malloc(longSideLen*longSideLen, 64);
+	unsigned char* pWork2 = (unsigned char*) _aligned_malloc(longSideLen*longSideLen, 64);
 	const unsigned char* pSrcLine = pSrc;
 	unsigned char* pDstLine = pWork;
 	for (size_t i=0; i<height; ++i) {
-		BoxBlur_2ndOrder(pSrcLine, pDstLine, width, 5);
+		pBlurFunc(pSrcLine, pDstLine, width, radius);
 		OffsetPtr(pSrcLine, width);
-		OffsetPtr(pDstLine, width);
+		OffsetPtr(pDstLine, longSideLen);
 	}
-	transpose(pWork, pWork2, width, height, width, width);
+	transpose(pWork, pWork2, width, height, longSideLen, longSideLen);
 	pSrcLine = pWork2;
 	pDstLine = pWork;
-	for (size_t i=0; i<height; ++i) {
-		BoxBlur_2ndOrder(pSrcLine, pDstLine, width, 5);
-		OffsetPtr(pSrcLine, width);
-		OffsetPtr(pDstLine, width);
-	}	
+	for (size_t i=0; i<width; ++i) {
+		pBlurFunc(pSrcLine, pDstLine, height, radius);
+		OffsetPtr(pSrcLine, longSideLen);
+		OffsetPtr(pDstLine, longSideLen);
+	}
+	transpose(pWork, pWork2, height, width, longSideLen, longSideLen);
 	return 0;
 }
 
