@@ -21,6 +21,10 @@ void BoxBlur_1stOrder(const uint8_t* src, uint8_t* dst, size_t count, uint16_t r
 	}
 }
 
+void BoxBlur_1stOrder_SubPixel(const uint8_t* src, uint8_t* dst, size_t count, float radius)
+{
+}
+
 void BoxBlur_2ndOrder(const uint8_t* src, uint8_t* dst, size_t count, uint16_t radius)
 {
 	uint32_t sumTail = 0;
@@ -98,17 +102,3 @@ void BoxBlur_3rdOrder(const uint8_t* src, uint8_t* dst, size_t count, uint16_t r
 		tmp  += src[i+len];
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
