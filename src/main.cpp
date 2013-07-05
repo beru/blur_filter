@@ -5,7 +5,8 @@
 #include "ReadImage/ReadImage.h"
 #include "ReadImage/File.h"
 
-#include "box_blur_1b.h"
+//#include "box_blur_1b.h"
+#include "subpixel_box_blur_1b.h"
 
 void transpose(
 	const unsigned char* pSrc,
@@ -58,11 +59,15 @@ int main(int argc, char** argv)
 		pSrc[i] = palettes[4 * pSrc[i]];
 	}
 
-	int radius = 3;
+	int radius = 1.1 * 256;
 	
-	BoxBlurFunc pBlurFunc = &BoxBlur_1stOrder;
+//	typedef void (*BoxBlurFunc)(const uint8_t* src, uint8_t* dst, size_t count, uint8_t radius);
+//	BoxBlurFunc pBlurFunc = &BoxBlur_1stOrder;
 //	BoxBlurFunc pBlurFunc = &BoxBlur_2ndOrder;
 //	BoxBlurFunc pBlurFunc = &BoxBlur_3rdOrder;
+
+	typedef void (*BoxBlurFunc)(const uint8_t* src, uint8_t* dst, size_t count, uint16_t radius);
+	BoxBlurFunc pBlurFunc = &SubPixel_BoxBlur_1stOrder;
 
 	size_t longSideLen = max(width, height);
 	unsigned char* pWork = (unsigned char*) _aligned_malloc(longSideLen*longSideLen, 64);

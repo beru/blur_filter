@@ -184,6 +184,10 @@
 				RelativePath="..\main.cpp"
 				>
 			</File>
+			<File
+				RelativePath="..\subpixel_box_blur_1b.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="ヘッダー ファイル"
@@ -200,6 +204,10 @@
 			</File>
 			<File
 				RelativePath="..\stdint.h"
+				>
+			</File>
+			<File
+				RelativePath="..\subpixel_box_blur_1b.h"
 				>
 			</File>
 		</Filter>

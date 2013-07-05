@@ -3,7 +3,7 @@
 
 #include <assert.h>
 
-void BoxBlur_1stOrder(const uint8_t* src, uint8_t* dst, size_t count, uint16_t radius)
+void BoxBlur_1stOrder(const uint8_t* src, uint8_t* dst, size_t count, uint8_t radius)
 {
 	uint32_t sum = 0;
 	for (size_t i=0; i<1+radius*2; ++i) {
@@ -21,11 +21,7 @@ void BoxBlur_1stOrder(const uint8_t* src, uint8_t* dst, size_t count, uint16_t r
 	}
 }
 
-void BoxBlur_1stOrder_SubPixel(const uint8_t* src, uint8_t* dst, size_t count, float radius)
-{
-}
-
-void BoxBlur_2ndOrder(const uint8_t* src, uint8_t* dst, size_t count, uint16_t radius)
+void BoxBlur_2ndOrder(const uint8_t* src, uint8_t* dst, size_t count, uint8_t radius)
 {
 	uint32_t sumTail = 0;
 	size_t i;
@@ -54,7 +50,7 @@ void BoxBlur_2ndOrder(const uint8_t* src, uint8_t* dst, size_t count, uint16_t r
 	}
 }
 
-void BoxBlur_3rdOrder(const uint8_t* src, uint8_t* dst, size_t count, uint16_t radius)
+void BoxBlur_3rdOrder(const uint8_t* src, uint8_t* dst, size_t count, uint8_t radius)
 {
 	int32_t tmp;
 	int32_t sum1 = 0;
