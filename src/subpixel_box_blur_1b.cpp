@@ -1,4 +1,5 @@
 #include "subpixel_box_blur_1b.h"
+#include "box_blur_1b.h"
 
 #include <assert.h>
 
@@ -6,11 +7,16 @@ void SubPixel_BoxBlur_1stOrder(const uint8_t* src, uint8_t* dst, size_t count, u
 {
 	size_t sum = 0;
 	
-	size_t oneMinusFrac = 0xFF - (radius & 0xFF);
+	size_t frac = radius & 0xFF;
+	if (!frac) {
+		BoxBlur_1stOrder(src, dst, count, radius>>8);
+		return;
+	}
+	size_t oneMinusFrac = 0x100 - frac;
 	size_t intRad = (radius + 0xFF) >> 8;
 	size_t intLen = 1 + intRad * 2;
-	size_t len = 0x100 + radius * 2;
-	size_t invLen = 0xFFFFFF / len;
+	size_t length = 0x100 + radius * 2;
+	size_t lengthInversed = 0xFFFFFF / length;
 	
 	for (size_t i=0; i<intLen; ++i) {
 		sum += src[i];
@@ -24,7 +30,7 @@ void SubPixel_BoxBlur_1stOrder(const uint8_t* src, uint8_t* dst, size_t count, u
 	
 	for (size_t i=intRad; i<count-intRad; ++i) {
 		size_t v = (sum << 8) - (tail + head) * oneMinusFrac;
-		v *= invLen;
+		v *= lengthInversed;
 		v >>= 24;
 		dst[i] = v;
 		sum -= tail;
