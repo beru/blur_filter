@@ -8,10 +8,6 @@ void SubPixel_BoxBlur1b_1stOrder(const uint8_t* src, uint8_t* dst, size_t count,
 	size_t sum = 0;
 	
 	size_t frac = radius & 0xFF;
-	if (!frac) {
-		BoxBlur1b_1stOrder(src, dst, count, radius>>8);
-		return;
-	}
 	size_t oneMinusFrac = 0x100 - frac;
 	size_t intRad = (radius + 0xFF) >> 8;
 	size_t intLen = 1 + intRad * 2;
@@ -43,5 +39,11 @@ void SubPixel_BoxBlur1b_1stOrder(const uint8_t* src, uint8_t* dst, size_t count,
 		hat = *pPlus;
 	}
 	
+}
+
+#include "BoxBlur1b.h"
+
+void SubPixel_BoxBlur1b_1stOrder(const BoxBlur1bParams& params)
+{
 }
 

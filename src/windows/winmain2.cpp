@@ -11,14 +11,11 @@
 
 #include "timer.h"
 #include "winutil.h"
-#include "trace.h"
 
 #include "ReadImage/ReadImage.h"
 #include "ReadImage/File.h"
 
-#include "box_blur_1b.h"
-#include "subpixel_box_blur_1b.h"
-
+#include "blur/BoxBlur1b.h"
 
 namespace {
 
@@ -39,6 +36,7 @@ int x_ = 0;
 int y_ = 0;
 
 const UINT_PTR TIMER_ID = 100;
+const int TIMER_ELAPSE = 50;
 
 void loadImage(const wchar_t* fileName)
 {
@@ -61,19 +59,25 @@ void loadImage(const wchar_t* fileName)
 void render()
 {
 //	TRACE("%d ", x_);
-
-	typedef void (*BoxBlurFunc)(const uint8_t* src, uint8_t* dst, size_t count, uint16_t radius);
-	BoxBlurFunc pBlurFunc = &SubPixel_BoxBlur_1stOrder;
-	const unsigned char* pSrcLine = pImage;
-	size_t width = imageInfo.width;
-	size_t height = imageInfo.height;
-	unsigned char* pDstLine = (unsigned char*)pBits;
-	uint16_t radius = x_*(100+y_)/100.0;
-	for (size_t i=0; i<min(dstHeight,height); ++i) {
-		pBlurFunc(pSrcLine, pDstLine, min(width, dstWidth), radius);
-		OffsetPtr(pSrcLine, width);
-		OffsetPtr(pDstLine, dstWidth);
-	}
+	
+	BoxBlur1bParams params;
+	params.src = pImage;
+	params.dst = (unsigned char*)pBits;
+	params.srcLineOffsetBytes = imageInfo.width;
+	params.dstLineOffsetBytes = dstWidth;
+	params.width = min(dstWidth, imageInfo.width);
+	params.height = min(dstHeight, imageInfo.height);
+#if 0
+	params.hRadius = x_;
+	params.vRadius = y_;
+#else
+	params.hRadius = x_ * 2;
+	params.vRadius = y_ * 2;
+#endif
+	params.subpixelRadius = false;
+	params.quality = 0;
+	
+	BoxBlur1b(params);
 }
 
 } // anonymous namespace
@@ -82,7 +86,7 @@ void render()
 
 void OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
-	::SetTimer(hWnd, TIMER_ID, 50, 0);
+	::SetTimer(hWnd, TIMER_ID, TIMER_ELAPSE, 0);
 	
 	BITMAPINFO* pBMI = (BITMAPINFO*) &bmiBuff[0];
 	BITMAPINFO& bmi = *pBMI;
@@ -113,8 +117,6 @@ void OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	if (argc >= 2) {
 		loadImage(argv[1]);
 	}
-
-	x_ = 64;
 }
 
 void OnDestroy(HWND hWnd, WPARAM wParam, LPARAM lParam)

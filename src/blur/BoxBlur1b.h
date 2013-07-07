@@ -1,6 +1,22 @@
 #pragma once
 
-void BoxBlur1b_1stOrder(const uint8_t* src, uint8_t* dst, size_t count, uint8_t radius);
-void BoxBlur1b_2ndOrder(const uint8_t* src, uint8_t* dst, size_t count, uint8_t radius);
-void BoxBlur1b_3rdOrder(const uint8_t* src, uint8_t* dst, size_t count, uint8_t radius);
+struct BoxBlur1bParams
+{
+	const uint8_t* src;
+	uint8_t* dst;
+	
+	int16_t srcLineOffsetBytes;
+	int16_t dstLineOffsetBytes;
+
+	uint16_t width;
+	uint16_t height;
+	
+	uint16_t hRadius;
+	uint16_t vRadius;
+	
+	bool subpixelRadius;
+	uint8_t quality;
+};
+
+void BoxBlur1b(const BoxBlur1bParams& params);
 

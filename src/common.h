@@ -4,6 +4,7 @@
 #include <tchar.h>
 #include <assert.h>
 #include "stdint.h"
+#include "windows/trace.h"
 
 template <typename T>
 __forceinline void OffsetPtr(T*& ptr, ptrdiff_t offsetBytes)

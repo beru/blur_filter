@@ -1,45 +1,84 @@
 
 #include <assert.h>
 
-namespace {
+#include "BoxBlur1b.h"
+#include "RingLinePtr.h"
+#include <vector>
 
-void hblur(const uint8_t* src, uint32_t* dst, size_t count, uint8_t radius)
+void BoxBlur1b_1stOrder(const BoxBlur1bParams& params)
 {
-	uint32_t sum = 0;
-	size_t len = 1 + radius*2;
-	for (size_t i=0; i<len; ++i) {
-		sum += src[i];
-	}
-	const uint8_t* pPlus = &src[len];
-	const uint8_t* pMinus = &src[0];
+	uint32_t hRad = params.hRadius >> 8;
+	uint32_t vRad = params.vRadius >> 8;
+	uint32_t hLen = 1 + hRad*2;
+	uint32_t vLen = 1 + vRad*2;
+	uint32_t invLen = 0xFFFFFF / (hLen*vLen);
+	uint32_t hCount = params.width;
+	uint32_t vCount = params.height;
+
+	const uint8_t* hLine = params.src;
+	uint8_t* vLine = params.dst;
+
+	OffsetPtr(vLine, params.dstLineOffsetBytes * vRad);
+
+	std::vector<uint32_t> vSumLine(params.width);
+	std::vector<uint16_t> work(params.width * vLen);
+	uint16_t* pWork = &work[0];
 	
-	for (size_t i=radius; i<count-radius; ++i) {
-		dst[i] = sum;
-		sum += *pPlus++;
-		sum -= *pMinus++;
+	RingLinePtr<uint16_t*> vMinusLine(vLen, 0, pWork, params.width*2);
+	RingLinePtr<uint16_t*> vPlusLine(vLen, 0, pWork, params.width*2);
+
+	// vTop collect
+	for (size_t y=0; y<vLen; ++y) {
+		const uint8_t* hMinus = hLine;
+		const uint8_t* hPlus = hLine+hLen;
+		size_t hSum = 0;
+		// hLeft collect
+		for (size_t x=0; x<hLen; ++x) {
+			hSum += hLine[x];
+		}
+		// hCenter
+		for (size_t x=hRad; x<hCount-hRad; ++x) {
+			hSum -= *hMinus++;
+			hSum += *hPlus++;
+			vPlusLine[x] = hSum;
+			vSumLine[x] += hSum;
+		}
+		// hRight
+		;
+		OffsetPtr(hLine, params.srcLineOffsetBytes);
+		vPlusLine.moveNext();
 	}
-}
 
-void vblur()
+	// vMiddle
+	for (size_t y=vRad; y<vCount-vRad; ++y) {
 
-
-} // namespace anonymous
-
-void BoxBlur1b_1stOrder(const uint8_t* src, uint8_t* dst, size_t count, uint8_t radius)
-{
-	uint32_t sum = 0;
-	for (size_t i=0; i<1+radius*2; ++i) {
-		sum += src[i];
-	}
-	const uint8_t* pPlus = &src[1+radius*2];
-	const uint8_t* pMinus = &src[0];
-	
-	for (size_t i=radius; i<count-radius; ++i) {
-		uint32_t v = sum / (1+radius*2);
-		assert(v < 256);
-		dst[i] = v;
-		sum += *pPlus++;
-		sum -= *pMinus++;
+		const uint8_t* hMinus = hLine;
+		const uint8_t* hPlus = hLine+hLen;
+		size_t hSum = 0;
+		// hLeft collect
+		for (size_t x=0; x<hLen; ++x) {
+			hSum += hLine[x];
+		}
+		// hCenter
+		for (size_t x=hRad; x<hCount-hRad; ++x) {
+			hSum -= *hMinus++;
+			hSum += *hPlus++;
+			
+			// in this way, vPlus memory read is not required.
+			// but memory access pattern is a bit complex.
+			uint32_t vSum = vSumLine[x];
+			vSum -= vMinusLine[x];
+			vSum += hSum;
+			vPlusLine[x] = hSum;
+			vSumLine[x] = vSum;
+			vLine[x] = (vSum * invLen) >> 24;
+		}
+		// hRight
+		;
+		OffsetPtr(hLine, params.srcLineOffsetBytes);
+		OffsetPtr(vLine, params.dstLineOffsetBytes);
+		vMinusLine.moveNext();
+		vPlusLine.moveNext();
 	}
 }
 
