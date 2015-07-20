@@ -71,11 +71,11 @@ void render()
 	params.hRadius = x_;
 	params.vRadius = y_;
 #else
-	params.hRadius = x_ * 2;
-	params.vRadius = y_ * 2;
+	params.hRadius = x_ * 4;
+	params.vRadius = y_ * 4;
 #endif
-	params.subpixelRadius = false;
-	params.quality = 0;
+	params.subpixelRadius = true;
+	params.quality = 1;
 	
 	BoxBlur1b(params);
 }

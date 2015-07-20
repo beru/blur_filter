@@ -1,11 +1,7 @@
 
 #include <assert.h>
 
-namespace {
-
-
-
-} // namespace anonymous
+#include "BoxBlur1b.h"
 
 void BoxBlur1b_2ndOrder(const uint8_t* src, uint8_t* dst, size_t count, uint8_t radius)
 {
@@ -36,3 +32,13 @@ void BoxBlur1b_2ndOrder(const uint8_t* src, uint8_t* dst, size_t count, uint8_t 
 	}
 }
 
+void BoxBlur1b_2ndOrder(const BoxBlur1bParams& params)
+{
+	const uint8_t* pSrc = params.src;
+	uint8_t* pDst = params.dst;
+	for (size_t i=0; i<params.height; ++i) {
+		BoxBlur1b_2ndOrder(pSrc, pDst, params.width, params.hRadius >> 8);
+		OffsetPtr(pSrc, params.srcLineOffsetBytes);
+		OffsetPtr(pDst, params.dstLineOffsetBytes);
+	}
+}

@@ -4,5 +4,5 @@
 // decimal part : 8bit
 // fractional part : 8bit
 
-void SubPixel_BoxBlur1b_1stOrder(const uint8_t* src, uint8_t* dst, size_t count, uint16_t radius);
+void SubPixel_BoxBlur1b_1stOrder(const BoxBlur1bParams& params);
 
